@@ -2,6 +2,8 @@
 
 A map-first route builder for a two-person trip from Bangkok on 10 January 2027 to Seoul on 31 March 2027. Choose each next stop, compare hotels, and add restaurants, attractions, shops and activities before confirming a stay.
 
+[Implementation plan, subagent assignments and release checks](IMPLEMENTATION_PLAN.md)
+
 ## Run with Docker
 
 Install Docker with Compose, then run:
