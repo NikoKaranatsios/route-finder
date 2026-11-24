@@ -1,0 +1,29 @@
+name: Docker smoke test
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+
+jobs:
+  container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JavaScript
+        run: |
+          for file in dist/*.js; do node --check "$file"; done
+      - name: Start the image and wait for it to be healthy
+        run: docker compose up --build -d --wait --wait-timeout 90
+      - name: Verify the files served by Nginx
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmp dist/index.html <(curl -fsS http://localhost:8080/)
+          for file in dist/*; do
+            cmp "$file" <(curl -fsS "http://localhost:8080/${file#dist/}")
+          done
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/unknown-file)" = 404
+      - name: Stop the container
+        if: always()
+        run: docker compose down
+
